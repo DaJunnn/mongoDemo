@@ -1,15 +1,16 @@
-import { model, Schema } from "mongoose";
+import { Schema, model } from "mongoose";
 import { Student } from "../../interfaces/Student";
 
-export const studentsSchemas = new Schema<Student>({
-    userName:{ type: String, required: true },
-    sid:{ type: String, required: true },
-    name:{ type: String, required: true },
-    department:{ type: String, required: true },
-    grade:{ type: String, required: true },
-    class:{ type: String, required: true },
-    Email:{ type: String, required: true },
-    absences:{ type: Number, required: false },
+const studentSchema = new Schema<Student>({
+  _id: { type: Schema.Types.ObjectId, auto: true }, // 確保 _id 正確
+  userName: { type: String, required: true },
+  sid: { type: String },
+  name: { type: String },
+  department: { type: String },
+  grade: { type: String },
+  class: { type: String },
+  Email: { type: String },
+  absences: { type: Number, default: 0 },
 });
 
-export const studentsModel = model<Student>('students', studentsSchemas);
+export const studentsModel = model<Student>("students", studentSchema);
