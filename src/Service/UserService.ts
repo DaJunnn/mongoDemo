@@ -1,4 +1,3 @@
-import { ObjectId } from "mongodb";
 import { Service } from "../abstract/Service";
 import { DBResp } from "../interfaces/DBResp";
 import { Student } from "../interfaces/Student";
@@ -17,8 +16,17 @@ export class UserService extends Service {
         }
     }
 
-    // 根據 ID 刪除學生
+    /**
+     * 根據 ID 刪除學生
+     * 業務:
+     * 1. 檢查id是否存在
+     * 2. 存在: 直接刪
+     * 3. 不存在: error
+     * @param id 
+     * @returns 
+     */
     public async deleteById(id: string) {
+
         const response: resp<any> = {
             code: 200,
             message: "",
@@ -26,18 +34,16 @@ export class UserService extends Service {
         };
 
         try {
-            if (!ObjectId.isValid(id)) {
-                response.code = 400;
-                response.message = "無效的 ID 格式";
-                return response;
-            }
 
-            const result = await studentsModel.deleteOne({ _id: new ObjectId(id) });
-
-            if (result.deletedCount === 0) {
+            /**
+             * 有　/ 沒有
+             */
+            const user: DBResp<Student> | null = await studentsModel.findById(id);
+            if (!user) {
                 response.code = 404;
                 response.message = "找不到該用戶，請確認 ID 是否正確。";
             } else {
+                const result =  await studentsModel.deleteOne({_id:id});
                 response.message = "刪除成功";
                 response.body = result;
             }
@@ -99,13 +105,12 @@ export class UserService extends Service {
         };
 
         try {
-            if (!ObjectId.isValid(id)) {
-                response.code = 400;
+            const user :DBResp<Student> | null = await studentsModel.findById(id);
+            if (!user) {
+                response.code = 404;
                 response.message = "無效的 ID 格式";
                 return response;
             }
-
-            const user = await studentsModel.findById(id);
 
             if (user) {
                 user.name = name || user.name;
